@@ -1,3 +1,4 @@
+import { useEffect, useState, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { StatsCard } from "@/components/StatsCard";
 import { ChallengeCard } from "@/components/ChallengeCard";
@@ -5,11 +6,11 @@ import { AchievementCard } from "@/components/AchievementCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Activity, 
-  Clock, 
-  Target, 
-  TrendingUp, 
+import {
+  Activity,
+  Clock,
+  Target,
+  TrendingUp,
   Calendar,
   ChevronRight,
   PlayCircle,
@@ -17,15 +18,91 @@ import {
   Trophy
 } from "lucide-react";
 import heroImage from "@/assets/hero-runner.jpg";
+import { TeamGoalCard } from "@/components/TeamGoalCard";
+import { RunRecordForm } from "@/components/RunRecordForm";
+import { db } from "@/firebase";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 const Index = () => {
+  // 샘플/임시 데이터
+  const teamGoal = 100;
+  const teamWeek = "2024-W23";
+  const userId = "user1";
+  const teamId = "team1";
+
+  // Firestore에서 불러온 기록 상태 (팀 전체)
+  const [members, setMembers] = useState<{ name: string; distance: number }[]>([]);
+  const [teamCurrent, setTeamCurrent] = useState(0);
+  // Firestore에서 불러온 기록 상태 (해당 유저)
+  const [userRecords, setUserRecords] = useState<any[]>([]);
+
+  // 팀 전체 기록 실시간 구독
+  useEffect(() => {
+    const q = query(
+      collection(db, "runRecords"),
+      where("teamId", "==", teamId),
+      where("week", "==", teamWeek)
+    );
+    const unsub = onSnapshot(q, (snapshot) => {
+      const records = snapshot.docs.map(doc => doc.data() as any);
+      // 멤버별 합산
+      const memberMap: Record<string, number> = {};
+      records.forEach(r => {
+        memberMap[r.userId] = (memberMap[r.userId] || 0) + Number(r.distanceKm);
+      });
+      const memberArr = Object.entries(memberMap).map(([name, distance]) => ({ name, distance }));
+      setMembers(memberArr);
+      setTeamCurrent(records.reduce((sum, r) => sum + Number(r.distanceKm), 0));
+    });
+    return () => unsub();
+  }, [teamId, teamWeek]);
+
+  // 해당 유저 기록 실시간 구독
+  useEffect(() => {
+    const q = query(
+      collection(db, "runRecords"),
+      where("teamId", "==", teamId),
+      where("week", "==", teamWeek),
+      where("userId", "==", userId)
+    );
+    const unsub = onSnapshot(q, (snapshot) => {
+      setUserRecords(snapshot.docs.map(doc => doc.data() as any));
+    });
+    return () => unsub();
+  }, [teamId, teamWeek, userId]);
+
+  // 유저별 합산/평균 계산
+  const userStats = useMemo(() => {
+    if (userRecords.length === 0) return {
+      totalDistance: 0,
+      totalTime: 0,
+      totalCalories: 0,
+      avgPace: 0,
+      trendDistance: 0,
+      trendTime: 0,
+      trendCalories: 0,
+      trendPace: 0,
+    };
+    const totalDistance = userRecords.reduce((sum, r) => sum + Number(r.distanceKm), 0);
+    const totalTime = userRecords.reduce((sum, r) => sum + Number(r.timeMin || 0), 0);
+    const totalCalories = userRecords.reduce((sum, r) => sum + Number(r.calories || 0), 0);
+    const avgPace = userRecords.length > 0 ? (
+      userRecords.reduce((sum, r) => sum + Number(r.paceMinPerKm || 0), 0) / userRecords.length
+    ) : 0;
+    // trend 계산은 예시로 최근 2회 기록 차이(실제는 더 정교하게 가능)
+    const trendDistance = userRecords.length > 1 ? (userRecords[userRecords.length - 1].distanceKm - userRecords[userRecords.length - 2].distanceKm) : 0;
+    const trendTime = userRecords.length > 1 ? (userRecords[userRecords.length - 1].timeMin - userRecords[userRecords.length - 2].timeMin) : 0;
+    const trendCalories = userRecords.length > 1 ? (userRecords[userRecords.length - 1].calories - userRecords[userRecords.length - 2].calories) : 0;
+    const trendPace = userRecords.length > 1 ? (userRecords[userRecords.length - 1].paceMinPerKm - userRecords[userRecords.length - 2].paceMinPerKm) : 0;
+    return { totalDistance, totalTime, totalCalories, avgPace, trendDistance, trendTime, trendCalories, trendPace };
+  }, [userRecords]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div 
+        <div
           className="h-[300px] bg-cover bg-center bg-no-repeat relative"
           style={{ backgroundImage: `url(${heroImage})` }}
         >
@@ -40,60 +117,68 @@ const Index = () => {
                   오늘도 한 걸음 더 나아가세요
                 </h1>
                 <p className="text-xl text-white/90">
-                  25km 중 15km 완주 • 60% 달성
+                  {teamGoal}km 중 {teamCurrent}km 완주 • {Math.round((teamCurrent / teamGoal) * 100)}%
                 </p>
               </div>
-              <Button size="lg" className="bg-white text-foreground hover:bg-white/90">
-                <PlayCircle className="mr-2 h-5 w-5" />
-                러닝 시작하기
-              </Button>
             </div>
+
           </div>
         </div>
       </section>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* 메인 컨텐츠 패딩 래퍼 */}
+      <div className="px-4 md:px-8 max-w-5xl mx-auto">
+        {/* 러닝 기록 입력 폼 */}
+        <RunRecordForm userId={userId} teamId={teamId} week={teamWeek} />
+        {/* 팀 주간 목표 카드 */}
+        <div className="max-w-2xl mx-auto mt-8">
+          <TeamGoalCard
+            goal={teamGoal}
+            current={teamCurrent}
+            week={teamWeek}
+            members={members}
+          />
+        </div>
         {/* Stats Overview */}
-        <section className="space-y-4">
+        <section className="space-y-4 mt-8">
           <h2 className="text-2xl font-bold text-foreground">이번 주 현황</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatsCard
               title="총 거리"
-              value="15.2"
+              value={userStats.totalDistance.toFixed(2)}
               unit="km"
               icon={Activity}
-              trend="+2.1km 증가"
+              trend={userStats.trendDistance !== 0 ? `${userStats.trendDistance > 0 ? '+' : ''}${userStats.trendDistance.toFixed(2)}km` : undefined}
               color="primary"
             />
             <StatsCard
               title="러닝 시간"
-              value="1:45"
-              unit="시간"
+              value={userStats.totalTime.toFixed(0)}
+              unit="분"
               icon={Clock}
-              trend="+15분 증가"
+              trend={userStats.trendTime !== 0 ? `${userStats.trendTime > 0 ? '+' : ''}${userStats.trendTime}분` : undefined}
               color="success"
             />
             <StatsCard
               title="칼로리 소모"
-              value="1,240"
+              value={userStats.totalCalories.toFixed(0)}
               unit="kcal"
               icon={Target}
-              trend="+180kcal"
+              trend={userStats.trendCalories !== 0 ? `${userStats.trendCalories > 0 ? '+' : ''}${userStats.trendCalories}kcal` : undefined}
               color="info"
             />
             <StatsCard
               title="평균 페이스"
-              value="6:45"
+              value={userStats.avgPace.toFixed(2)}
               unit="min/km"
               icon={TrendingUp}
-              trend="15초 단축"
+              trend={userStats.trendPace !== 0 ? `${userStats.trendPace > 0 ? '+' : ''}${userStats.trendPace.toFixed(2)} min/km` : undefined}
               color="warning"
             />
           </div>
         </section>
 
         {/* Active Challenges */}
-        <section className="space-y-4">
+        <section className="space-y-4 mt-8">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-foreground">진행 중인 챌린지</h2>
             <Button variant="ghost" className="text-primary">
@@ -101,7 +186,7 @@ const Index = () => {
               <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ChallengeCard
               title="30일 꾸준히 달리기"
@@ -129,43 +214,9 @@ const Index = () => {
         </section>
 
         {/* Quick Actions */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground">빠른 실행</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="p-6 bg-gradient-primary text-white hover:shadow-primary hover:scale-[1.02] transition-all duration-300 cursor-pointer border-0">
-              <div className="flex items-center gap-4">
-                <PlayCircle className="h-8 w-8" />
-                <div>
-                  <h3 className="font-semibold">러닝 시작</h3>
-                  <p className="text-sm text-white/80">새로운 러닝 기록하기</p>
-                </div>
-              </div>
-            </Card>
-            
-            <Card className="p-6 bg-gradient-secondary text-white hover:shadow-elevated hover:scale-[1.02] transition-all duration-300 cursor-pointer border-0">
-              <div className="flex items-center gap-4">
-                <Calendar className="h-8 w-8" />
-                <div>
-                  <h3 className="font-semibold">운동 계획</h3>
-                  <p className="text-sm text-white/80">이번 주 계획 세우기</p>
-                </div>
-              </div>
-            </Card>
-            
-            <Card className="p-6 bg-gradient-card shadow-card hover:shadow-elevated hover:scale-[1.02] transition-all duration-300 cursor-pointer border-0">
-              <div className="flex items-center gap-4">
-                <Trophy className="h-8 w-8 text-accent" />
-                <div>
-                  <h3 className="font-semibold text-foreground">성과 분석</h3>
-                  <p className="text-sm text-muted-foreground">내 기록과 통계 보기</p>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </section>
 
         {/* Recent Achievements */}
-        <section className="space-y-4">
+        <section className="space-y-4 mt-8">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-foreground">최근 성취</h2>
             <Button variant="ghost" className="text-primary">
@@ -173,7 +224,7 @@ const Index = () => {
               <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <AchievementCard
               title="첫 10km 완주"

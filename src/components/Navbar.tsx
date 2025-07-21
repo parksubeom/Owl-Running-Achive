@@ -13,10 +13,10 @@ export const Navbar = () => {
                 <span className="text-white font-bold text-sm">R</span>
               </div>
               <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                RunChallenge
+                Owl Running Achieve
               </h1>
             </div>
-            
+
             <div className="hidden md:flex items-center gap-6">
               <a href="/" className="text-foreground hover:text-primary transition-colors font-medium">
                 대시보드
@@ -38,7 +38,7 @@ export const Navbar = () => {
               <Bell className="h-5 w-5" />
               <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full"></span>
             </Button>
-            
+
             <Avatar className="h-8 w-8">
               <AvatarImage src="" />
               <AvatarFallback className="bg-gradient-primary text-white">
