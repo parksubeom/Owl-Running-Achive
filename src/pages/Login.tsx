@@ -1,14 +1,18 @@
 import { Card } from "@/components/ui/card";
 import heroImage from "@/assets/hero-runner.jpg";
 
-// const KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_REDIRECT_URI&response_type=code";
+// .env 파일에 아래와 같이 설정하세요:
+// VITE_KAKAO_CLIENT_ID=your_kakao_rest_api_key
+// VITE_KAKAO_REDIRECT_URI=http://localhost:3000/login/callback (로컬)
+// VITE_KAKAO_REDIRECT_URI=https://your-service.com/login/callback (서비스)
+
+const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
+const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`;
 
 const KakaoLoginButton = () => {
     const handleLogin = () => {
-        // 실제 카카오 인증: window.location.href = KAKAO_AUTH_URL;
-        // 임시 로그인 처리
-        localStorage.setItem('isAuthenticated', 'true');
-        window.location.href = '/';
+        window.location.href = KAKAO_AUTH_URL;
     };
     return (
         <button
@@ -46,6 +50,10 @@ const Login = () => {
             </section>
             <Card className="w-full max-w-md p-8 shadow-card border-0 bg-gradient-card flex flex-col items-center">
                 <KakaoLoginButton />
+                <div className="text-xs text-muted-foreground mt-4 text-center">
+                    카카오 로그인 후 <b>/login/callback</b> 경로로 리디렉션됩니다.<br />
+                    (콜백 처리는 추후 백엔드/펑션 연동 시 구현)
+                </div>
             </Card>
         </div>
     );

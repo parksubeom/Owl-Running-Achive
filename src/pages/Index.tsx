@@ -26,7 +26,7 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 const Index = () => {
   // 샘플/임시 데이터
   const teamGoal = 100;
-  const teamWeek = "2024-W23";
+  const teamWeek = "2025-3w";
   const userId = "user1";
   const teamId = "team1";
 
