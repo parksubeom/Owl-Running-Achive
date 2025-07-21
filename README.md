@@ -1,73 +1,60 @@
-# Welcome to your Lovable project
+# Run-Play-Achieve
 
-## Project info
+러너들을 위한 게이미피케이션 웹 어플리케이션
 
-**URL**: https://lovable.dev/projects/88b42137-b894-41da-b24c-e961580fed4a
+## 소개
 
-## How can I edit this code?
+**Run-Play-Achieve**는 러닝(달리기)을 더 재미있고 지속적으로 만들기 위해 설계된 게이미피케이션 웹 어플리케이션입니다. 사용자는 다양한 러닝 챌린지에 참여하고, 목표를 달성하며, 업적을 해금하고, 자신의 기록을 시각적으로 확인할 수 있습니다.
 
-There are several ways of editing your application.
+## 주요 기능
 
-**Use Lovable**
+- **챌린지 시스템**: 다양한 러닝 미션(예: 5km 달성, 연속 7일 달리기 등)에 도전하고 보상을 획득할 수 있습니다.
+- **업적(업적 카드)**: 달성한 업적을 카드 형태로 수집하고, 자신의 성취를 한눈에 볼 수 있습니다.
+- **통계 및 기록**: 달리기 거리, 시간, 칼로리 소모 등 다양한 통계를 시각적으로 확인할 수 있습니다.
+- **반응형 UI**: 모바일과 데스크탑 모두에서 쾌적하게 사용할 수 있습니다.
+- **소셜 공유**: 자신의 기록과 업적을 친구들과 공유할 수 있습니다.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/88b42137-b894-41da-b24c-e961580fed4a) and start prompting.
+## 기술 스택
 
-Changes made via Lovable will be committed automatically to this repo.
+- **React** + **TypeScript**
+- **Vite** (빠른 개발 환경)
+- **Tailwind CSS** (스타일링)
+- **shadcn-ui** (UI 컴포넌트)
 
-**Use your preferred IDE**
+## 설치 및 실행 방법
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. 저장소 클론
+   ```bash
+   git clone <YOUR_GIT_URL>
+   cd run-play-achieve
+   ```
+2. 패키지 설치
+   ```bash
+   npm install
+   ```
+3. 개발 서버 실행
+   ```bash
+   npm run dev
+   ```
+4. 브라우저에서 `http://localhost:5173` 접속
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 폴더 구조
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+src/
+  components/      # UI 컴포넌트
+  hooks/           # 커스텀 훅
+  lib/             # 유틸리티 함수
+  pages/           # 주요 페이지
+  assets/          # 이미지 등 정적 자원
 ```
 
-**Edit a file directly in GitHub**
+## 기여 방법
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. 이슈를 등록하거나, 포크 후 브랜치 생성
+2. 변경사항 커밋 및 푸시
+3. Pull Request 생성
 
-**Use GitHub Codespaces**
+## 라이선스
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/88b42137-b894-41da-b24c-e961580fed4a) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+MIT
