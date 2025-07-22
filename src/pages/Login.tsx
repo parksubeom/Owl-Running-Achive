@@ -1,10 +1,6 @@
 import { Card } from "@/components/ui/card";
 import heroImage from "@/assets/hero-runner.jpg";
 
-// .env 파일에 아래와 같이 설정하세요:
-// VITE_KAKAO_CLIENT_ID=your_kakao_rest_api_key
-// VITE_KAKAO_REDIRECT_URI=http://localhost:3000/login/callback (로컬)
-// VITE_KAKAO_REDIRECT_URI=https://your-service.com/login/callback (서비스)
 
 const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
 const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
