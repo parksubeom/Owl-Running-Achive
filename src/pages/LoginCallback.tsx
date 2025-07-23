@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getAuth, signInWithCustomToken } from 'firebase/auth';
 
 const LoginCallback = () => {
     const [code, setCode] = useState<string | null>(null);
@@ -6,6 +7,26 @@ const LoginCallback = () => {
     useEffect(() => {
         const url = new URL(window.location.href);
         setCode(url.searchParams.get("code"));
+    }, []);
+
+    useEffect(() => {
+        const code = new URL(window.location.href).searchParams.get('code');
+        if (code) {
+            fetch('http://localhost:5001/Owl-Running-Achieve/asia-northeast3/kakaoAuth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code }),
+            })
+                .then(res => res.json())
+                .then(async data => {
+                    if (data.customToken) {
+                        const auth = getAuth();
+                        await signInWithCustomToken(auth, data.customToken);
+                        // 로그인 성공 후 리다이렉트 등
+                        console.log(data.customToken);
+                    }
+                });
+        }
     }, []);
 
     return (
