@@ -12,7 +12,7 @@ const LoginCallback = () => {
     useEffect(() => {
         const code = new URL(window.location.href).searchParams.get('code');
         if (code) {
-            fetch('http://localhost:5001/Owl-Running-Achieve/asia-northeast3/kakaoAuth', {
+            fetch('http://127.0.0.1:5001/owl-running-achieve/us-central1/kakaoAuth', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code }),

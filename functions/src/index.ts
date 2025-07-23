@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import axios from "axios";
 
-admin.initializeApp();
+//admin.initializeApp();
 const KAKAO_CLIENT_ID = "63da9f3220a466c8b8d5aca36e64f6b4"
 const KAKAO_REDIRECT_URI = "http://localhost:8080/login/callback"
 const KAKAO_CLIENT_SECRET = "k6DwWKqYJC86LBHLcjk6VJaB9AxBuSMd"
@@ -43,8 +43,15 @@ export const kakaoAuth = functions.https.onRequest(async (req, res) => {
 
         // 4. 커스텀 토큰 반환
         res.json({ customToken });
-    } catch (err: any) {
-        console.error(err.response?.data || err);
+    } catch (err: unknown) { // 1. 타입을 'unknown'으로 변경
+        // 2. err가 response 속성을 가진 객체인지 간단히 확인
+        if (typeof err === 'object' && err !== null && 'response' in err) {
+            // Axios 에러와 유사한 객체로 간주하고 데이터에 접근
+            console.error((err as { response?: { data?: unknown } }).response?.data || err);
+        } else {
+            // 일반적인 Error 객체나 문자열인 경우
+            console.error(err);
+        }
         res.status(500).json({ error: "카카오 인증 실패" });
     }
 });
