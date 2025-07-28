@@ -1,8 +1,14 @@
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
-import axios from "axios";
+import functions from "firebase-functions";
+import admin from "firebase-admin";
 
-//admin.initializeApp();
+
+admin.initializeApp({
+    credential: admin.credential.cert(
+        "../owl-running-achieve-firebase-adminsdk-fbsvc-8d491097e7.json"
+    ),
+});
+
+import axios from "axios";
 const KAKAO_CLIENT_ID = "63da9f3220a466c8b8d5aca36e64f6b4"
 const KAKAO_REDIRECT_URI = "http://localhost:8080/login/callback"
 const KAKAO_CLIENT_SECRET = "k6DwWKqYJC86LBHLcjk6VJaB9AxBuSMd"
