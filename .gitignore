@@ -18,13 +18,10 @@ firebase-debug.log         # Firebase CLI 디버그 로그
 firebase-debug.log.*
 .firebaserc                # Firebase 프로젝트 별칭 설정 (선택 사항, 팀 공유 시에는 올리기도 함)
 firebase.json              # Firebase 프로젝트 설정 (대부분 공유하지만, 특정 설정은 상황에 따라 예외)
+.env
+*.json
+functions/*.json
 
-# Firebase Admin SDK Key (최고 중요!)
-# 이 서비스 계정 키 파일은 절대로 Git 저장소에 커밋되면 안 됩니다.
-# 파일이 위치한 정확한 경로를 명시하여 Git 추적을 막습니다.
-functions/owl-running-achieve-firebase-adminsdk-fbsvc-8d491097e7.json
-# 컴파일된 /lib 폴더에도 동일한 파일이 복사될 경우를 대비
-functions/lib/owl-running-achieve-firebase-adminsdk-fbsvc-8d491097e7.json
 
 # Compiled output (for TypeScript/JavaScript functions)
 # TypeScript 등으로 작성된 functions 코드가 컴파일되는 결과물 폴더
